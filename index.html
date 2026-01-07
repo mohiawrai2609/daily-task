@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DailyTask - Premium Task Manager</title>
+    <meta name="description" content="A daily-use task reminder website for managing your work efficiently.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icons (Material Symbols) -->
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Auth Section -->
+    <div id="auth-container" class="auth-wrapper">
+        <div class="glass-card login-card">
+            <h1>Welcome Back</h1>
+            <p>Organize your day, achieve your goals.</p>
+
+            <form id="login-form">
+                <div class="input-group">
+                    <span class="material-symbols-rounded">person</span>
+                    <input type="text" id="username" placeholder="Username" required>
+                </div>
+                <!-- Password is just visual for this local demo -->
+                <div class="input-group">
+                    <span class="material-symbols-rounded">lock</span>
+                    <input type="password" id="password" placeholder="Password" required>
+                </div>
+                <button type="submit" class="btn-primary">Login / Signup</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- App Dashboard (Hidden by default) -->
+    <div id="app-container" class="app-wrapper hidden">
+
+        <!-- Sidebar -->
+        <aside class="sidebar glass-panel">
+            <div class="logo">
+                <span class="material-symbols-rounded">check_circle</span>
+                <span>DailyTask</span>
+            </div>
+
+            <nav>
+                <ul>
+                    <li class="active" data-view="dashboard">
+                        <span class="material-symbols-rounded">dashboard</span>
+                        <span>Dashboard</span>
+                    </li>
+                    <li data-view="tasks">
+                        <span class="material-symbols-rounded">list_alt</span>
+                        <span>All Tasks</span>
+                    </li>
+                    <li data-view="calendar">
+                        <span class="material-symbols-rounded">calendar_month</span>
+                        <span>Calendar</span>
+                    </li>
+                    <li data-view="history">
+                        <span class="material-symbols-rounded">history</span>
+                        <span>History</span>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="user-profile">
+                <div class="avatar" id="user-avatar">U</div>
+                <div class="user-info">
+                    <span id="display-username">User</span>
+                    <button id="logout-btn"><span class="material-symbols-rounded">logout</span></button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <!-- Header -->
+            <header>
+                <div class="greeting">
+                    <h2 id="page-title">Dashboard</h2>
+                    <p id="current-date">Fetching date...</p>
+                </div>
+                <button class="btn-primary" id="add-task-btn">
+                    <span class="material-symbols-rounded">add</span> New Task
+                </button>
+            </header>
+
+            <!-- Dashboard View -->
+            <section id="view-dashboard" class="content-view active">
+                <div class="stats-grid">
+                    <div class="stat-card blue">
+                        <div class="icon-box"><span class="material-symbols-rounded">today</span></div>
+                        <div class="info">
+                            <h3>Today</h3>
+                            <span class="count" id="count-today">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card orange">
+                        <div class="icon-box"><span class="material-symbols-rounded">hourglass_top</span></div>
+                        <div class="info">
+                            <h3>Pending</h3>
+                            <span class="count" id="count-pending">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="icon-box"><span class="material-symbols-rounded">check_circle</span></div>
+                        <div class="info">
+                            <h3>Completed</h3>
+                            <span class="count" id="count-completed">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card red">
+                        <div class="icon-box"><span class="material-symbols-rounded">warning</span></div>
+                        <div class="info">
+                            <h3>Overdue</h3>
+                            <span class="count" id="count-overdue">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title">
+                    <h3>Today's Focus</h3>
+                </div>
+                <div class="tasks-list" id="dashboard-tasks">
+                    <!-- Tasks will be injected here -->
+                    <div class="empty-state">No tasks for today. Enjoy your day!</div>
+                </div>
+            </section>
+
+            <!-- Tasks View -->
+            <section id="view-tasks" class="content-view hidden">
+                <div class="filter-bar glass-panel">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="pending">Pending</button>
+                    <button class="filter-btn" data-filter="in-progress">In Progress</button>
+                    <button class="filter-btn" data-filter="completed">Completed</button>
+                </div>
+                <div class="tasks-list full-list" id="all-tasks-list">
+                    <!-- All Tasks injected here -->
+                </div>
+            </section>
+
+            <!-- Calendar View -->
+            <section id="view-calendar" class="content-view hidden">
+                <div class="calendar-container glass-panel">
+                    <div class="calendar-header">
+                        <button id="prev-month"><span class="material-symbols-rounded">chevron_left</span></button>
+                        <h3 id="calendar-month-year">Month Year</h3>
+                        <button id="next-month"><span class="material-symbols-rounded">chevron_right</span></button>
+                    </div>
+                    <div class="calendar-grid" id="calendar-grid">
+                        <!-- Calendar days -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- History View -->
+            <section id="view-history" class="content-view hidden">
+                <div class="tasks-list" id="history-list">
+                    <!-- Completed tasks history -->
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Modal for New/Edit Task -->
+    <div id="task-modal" class="modal hidden">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h3 id="modal-title">Create New Task</h3>
+                <button id="close-modal"><span class="material-symbols-rounded">close</span></button>
+            </div>
+            <form id="task-form">
+                <input type="hidden" id="task-id">
+
+                <div class="form-group">
+                    <label>Task Title</label>
+                    <input type="text" id="task-title" required placeholder="e.g., Submit Project Report">
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="task-desc" placeholder="Details about the task..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Due Date</label>
+                        <input type="date" id="task-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Time</label>
+                        <input type="time" id="task-time" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Priority</label>
+                        <select id="task-priority">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="task-status">
+                            <option value="pending">Pending</option>
+                            <option value="in-progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Customer Email (for updates)</label>
+                    <input type="email" id="task-customer-email" placeholder="client@example.com">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="cancel-task">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Permission Banner -->
+    <div id="notification-banner" class="notification-banner hidden">
+        <p>Enable notifications to get task reminders.</p>
+        <button id="enable-notifications">Enable</button>
+        <button id="dismiss-notifications">Later</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
