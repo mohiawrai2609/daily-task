@@ -150,6 +150,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('task-priority').value = task.priority;
             document.getElementById('task-status').value = task.status;
             document.getElementById('task-customer-email').value = task.customerEmail || '';
+            document.getElementById('task-customer-whatsapp').value = task.customerWhatsapp || '';
+            document.getElementById('task-bill-amount').value = task.billAmount || '';
         } else {
             modalTitle.textContent = 'Create New Task';
             taskForm.reset();
@@ -158,6 +160,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('task-date').valueAsDate = new Date();
             document.getElementById('task-status').value = 'pending';
             document.getElementById('task-customer-email').value = '';
+            document.getElementById('task-customer-whatsapp').value = '';
+            document.getElementById('task-bill-amount').value = '';
         }
     }
 
@@ -178,6 +182,8 @@ document.addEventListener('DOMContentLoaded', () => {
             priority: document.getElementById('task-priority').value,
             status: document.getElementById('task-status').value,
             customerEmail: document.getElementById('task-customer-email').value,
+            customerWhatsapp: document.getElementById('task-customer-whatsapp').value,
+            billAmount: document.getElementById('task-bill-amount').value,
             createdAt: id ? tasks.find(t => t.id === id).createdAt : new Date().toISOString()
         };
 
@@ -190,9 +196,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const username = currentUser ? currentUser.username : 'User';
                 sendNotification(`Task Completed: ${newTask.title}`, `Great job ${username}!`);
 
-                // Prompt to send client email
-                if (newTask.customerEmail) {
-                    sendClientEmail(newTask);
+                // Prompt to send client email/whatsapp
+                if (newTask.customerEmail || newTask.customerWhatsapp) {
+                    handleCustomerNotification(newTask);
                 }
             }
 
@@ -310,9 +316,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const username = currentUser ? currentUser.username : 'User';
                 sendNotification(`Task Completed`, `Great job ${username}! You finished '${task.title}'!`);
 
-                // Prompt to send client email
-                if (task.customerEmail) {
-                    setTimeout(() => sendClientEmail(task), 500); // Small delay to let UI update
+                // Prompt to send client email/whatsapp
+                if (task.customerEmail || task.customerWhatsapp) {
+                    setTimeout(() => handleCustomerNotification(task), 500);
                 }
             }
             saveTasks();
@@ -463,11 +469,36 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function sendClientEmail(task) {
-        if (confirm(`Task "${task.title}" is done. Do you want to notify the customer (${task.customerEmail})?`)) {
-            const subject = `Task Completed: ${task.title}`;
-            const body = `Hello,\n\nWe are pleased to inform you that your assigned task "${task.title}" has been successfully completed.\n\nTask Details:\n- Title: ${task.title}\n- Completed On: ${new Date().toLocaleDateString()}\n\nThank you for your business.\n\nBest regards,\n${currentUser ? currentUser.username : 'Management Team'}`;
+    function handleCustomerNotification(task) {
+        const hasEmail = !!task.customerEmail;
+        const hasWhatsapp = !!task.customerWhatsapp;
+        const billAmount = task.billAmount ? `Amount: ₹${task.billAmount}` : '';
 
+        let msg = `Task "${task.title}" is done. Notify customer via:`;
+        if (hasEmail) msg += `\n- Email (${task.customerEmail})`;
+        if (hasWhatsapp) msg += `\n- WhatsApp (${task.customerWhatsapp})`;
+
+        if (!confirm(msg)) return;
+
+        // WhatsApp
+        if (hasWhatsapp) {
+            let waBody = `Hello, your task "${task.title}" is successfully completed.`;
+            if (billAmount) waBody += `\n\nTotal Bill: ${billAmount}\nPlease make the payment.`;
+
+            const waUrl = `https://wa.me/${task.customerWhatsapp}?text=${encodeURIComponent(waBody)}`;
+            window.open(waUrl, '_blank');
+        }
+
+        // Email
+        if (hasEmail) {
+            const subject = `Task Completed: ${task.title}`;
+            let body = `Hello,\n\nWe are pleased to inform you that your assigned task "${task.title}" has been successfully completed.\n\nTask Details:\n- Title: ${task.title}\n- Completed On: ${new Date().toLocaleDateString()}`;
+
+            if (billAmount) {
+                body += `\n\n--------------------------------\nINVOICE DETAILS\n--------------------------------\n${billAmount}\nStatus: Due\n\nPlease make the payment at your earliest convenience.`;
+            }
+
+            body += `\n\nThank you for your business.\n\nBest regards,\n${currentUser ? currentUser.username : 'Management Team'}`;
             window.location.href = `mailto:${task.customerEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         }
     }
